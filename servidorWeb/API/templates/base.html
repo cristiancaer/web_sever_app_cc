@@ -1,0 +1,23 @@
+{% extends 'bootstrap/base.html'%}
+{% block head%}
+{{super()}}
+    <title>
+        {% block title%}
+            Cenicaña |
+        {%endblock%}
+    </title>
+{%endblock%}
+
+{%block body%}
+    {%block nav%}
+        {% include 'navbar.html'%}
+    {% endblock%}
+
+    {% block content%}
+    {%endblock%}
+
+    {% block scripts%}
+    {{super()}}
+    {%endblock%}
+
+{% endblock%}

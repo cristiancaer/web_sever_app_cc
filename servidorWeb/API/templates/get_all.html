@@ -1,0 +1,18 @@
+{% extends 'base.html'%}
+{% block title%}
+    {{super()}}
+    get_all
+{%endblock%}
+{% block content %}
+    <ul>
+        <li> Time | massflow | humedity </li>
+        {% for time,datos in data.items()%}
+            
+        <li>{{time}}
+            {% for dato in datos.values()%} 
+            {{separator}}{{dato}}
+            {%endfor%}
+        </li>
+        {%endfor%}
+    </ul>
+{%endblock%}

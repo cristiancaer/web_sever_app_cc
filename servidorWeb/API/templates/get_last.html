@@ -1,0 +1,15 @@
+{% extends 'base.html'%}
+{% block title%}
+    {{super()}}
+    get_last
+{%endblock%}
+{% block content %}
+    <ul>
+        {% for key,dato in data.items()%}
+            
+            <li class="data">
+                {{key}}{{separator}}{{dato}}
+            </li>
+        {%endfor%}
+    </ul>
+{%endblock%}
