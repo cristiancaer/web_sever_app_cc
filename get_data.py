@@ -1,4 +1,3 @@
-import queue
 import requests
 from threading import Thread
 from queue import Queue
@@ -25,11 +24,9 @@ class Communication(Thread):
     def run(self) -> None:
         while self.running:
             info=self.get_last_data()
-            print(info)
             if info:
                 self.que.put(info)
-            else:
-                print('no data')
+            
             sleep(2)
 class AnalogOput(Thread):
     def __init__(self, minInput,maxIput,minOutput,maxOutput,que_mass_flow) -> None:
@@ -45,9 +42,12 @@ class AnalogOput(Thread):
         return output
     def run(self):
         while self.runing:
-            info_mass_flow=self.que_mass_flow.get()
-            mass_flow=info_mass_flow.get('mass_flow')
-            print(mass_flow)
+            if not self.que_mass_flow.empty():
+                info_mass_flow=self.que_mass_flow.get()
+                print(info_mass_flow)
+                mass_flow=info_mass_flow.get('mass_flow')
+                print('mass',mass_flow)
+
 
 if __name__=='__main__':
     que_mass_flow=Queue()
@@ -56,6 +56,7 @@ if __name__=='__main__':
     comm.start()
     analogOutput=AnalogOput(0,1,0,5,que_mass_flow)
     analogOutput.start()
+    
     while True:
         c=input("press c to exit")
         if c=='c':
