@@ -51,11 +51,11 @@ class ConnectionRedis(ConnectionDb):
                 ret=False
             return ret
     def get_all_data_flow_mass(self):
-        data=self.db.hgetall(self.varname).items()
+        data=sorted(self.db.hgetall(self.varname).items())
         data={"{}".format(self.binary2utf8(index)):self.str2dict(data) for index,data in data }
         return data
     def get_last_data_flow_mass(self):
-        data=sorted(list(self.db.hgetall(self.varname).items()))
+        data=sorted(self.db.hgetall(self.varname).items())
         if len(data):
             time,data=data[-1]#last data
             data=self.str2dict(data)
