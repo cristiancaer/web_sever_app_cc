@@ -10,6 +10,8 @@ class Communication(Thread):
         self.que=que_mass_flow
         self.running=True
         self.separator='---'
+        self.watchdog=5# number of times witout request before raise exception
+        self.time_betwin_request=2# in seconds
     def get_last_data(self):
         res= requests.get(self.url)
         info={}
@@ -26,6 +28,13 @@ class Communication(Thread):
             info=self.get_last_data()
             if info:
                 self.que.put(info)
+                self.watchdog=5
+            else:
+                if  self.watchdog:
+                    self.watchdog-=1
+                else:
+                    print("Server working. But mass_flow.py isn't loading data")
+                    self.que.put(info)
             
             sleep(2)
 class AnalogOput(Thread):
@@ -46,7 +55,11 @@ class AnalogOput(Thread):
                 info_mass_flow=self.que_mass_flow.get()
                 print(info_mass_flow)
                 mass_flow=info_mass_flow.get('mass_flow')
-                print('mass',mass_flow)
+                # mass_flow_voltage=self.convert_value(mass_flow)
+                # print('mass',mass_flow)
+                # print('voltage',mass_flow_voltage)
+
+
 
 
 if __name__=='__main__':
