@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask,session
 from .config import Config,configdb
 from .connection.models.connectionDb import ConnectionRedis
 from .connection import connection
@@ -15,5 +15,4 @@ def create_app():
     context = _app_ctx_stack
     if not hasattr(context, 'db'):
         context.db = ConnectionRedis(**configdb)
-    
     return app

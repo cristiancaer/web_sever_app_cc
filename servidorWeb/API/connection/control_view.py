@@ -1,27 +1,23 @@
 from flask.helpers import url_for
-from .models import PutForm,separator
+from .models import PutFlowForm,separator
 from . import connection
-from flask import _app_ctx_stack,render_template,redirect,url_for,request,jsonify
+from flask import _app_ctx_stack,render_template,redirect,url_for,request,jsonify,session
 import json 
 
-@connection.route('/put/',methods=["GET","POST"])
-def put():
-    put_form=PutForm()
+@connection.route('/put_flow/',methods=["GET","POST"])
+def put_flow():
+    put_form=PutFlowForm()
     if request.method == 'POST':
         mass_flow=put_form.mass_flow.data
-        humidity=put_form.humidity.data
         if hasattr(_app_ctx_stack,'db'):
             db=_app_ctx_stack.db
             newdata={'mass_flow':mass_flow,
-                     'humidity': humidity,
                         }
             ret=db.put_data_flow_mass(**newdata)
-            if ret:
-                _app_ctx_stack.data_available=True
         else:
             raise Exception("Db not find")
-        return redirect(url_for('connection.put'))
-    return render_template('put.html',put_form=put_form)
+        return redirect(url_for('connection.put_flow'))
+    return render_template('put_flow.html',put_form=put_form)
 
 @connection.route('/get_all/')
 def get_all():
@@ -34,16 +30,18 @@ def get_all():
     else:
         raise Exception('DB not find')
     return render_template('get_all.html',**context)
-@connection.route('/data_available/')
-def data_available():
-    if not hasattr(_app_ctx_stack,'data_available'):
-        _app_ctx_stack.data_available=False
-    if _app_ctx_stack.data_available:
-        _app_ctx_stack.data_available=False
-        return redirect(url_for('connection.get_last_data'))
+@connection.route('/data_flow_available/')
+def data_flow_available():
+    if hasattr(_app_ctx_stack,'db'):
+        db=_app_ctx_stack.db
+        new_len_data_flow=db.len_data_flow()
+        data_available=not session.get('data_flow_available')==new_len_data_flow
+    if data_available:
+        session['data_flow_available']=new_len_data_flow
+        return redirect(url_for('connection.get_last_data_flow'))
     return "None"
-@connection.route('/get_last/')
-def get_last_data():
+@connection.route('/get_last_flow/')
+def get_last_data_flow():
     if hasattr(_app_ctx_stack,'db'):
         db=_app_ctx_stack.db
         data=db.get_last_data_flow_mass()
