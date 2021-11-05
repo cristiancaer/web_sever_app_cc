@@ -6,3 +6,7 @@ separator="---"
 class PutFlowForm(FlaskForm):
     mass_flow=FloatField('mass_flow',validators=[DataRequired()])
     sent=SubmitField()
+    
+class PutHumidityForm(FlaskForm):
+    humidity=FloatField('humidity',validators=[DataRequired()])
+    sent=SubmitField()

@@ -17,7 +17,7 @@ class GenerarDatos(Thread):
     putData=PutData(url)
     def run(self):
         while self.running:
-            data=randint(100)
+            data=randint(9,60)
             data={'mass_flow':data}
             print('sent',self.putData.sent(data))
             sleep(4)

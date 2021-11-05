@@ -25,12 +25,14 @@ class ConnectionRedis(ConnectionDb):
     def __init__(self,**config):
         self.config_db(**config)
         self.make_connection()
+        
     def config_db(self,**config):
         self.host=config.get('host')
         self.db_name=config.get('db_name')
         self.port=config.get('port')
         self.timeformat=config.get('timeformat')
         self.varname_flow=str(config.get('varname_flow'))
+        self.varname_humidity=str(config.get('varname_humidity'))
         
     def make_connection(self):
         self.db = redis.StrictRedis(host=self.host,
@@ -40,6 +42,14 @@ class ConnectionRedis(ConnectionDb):
             
     def check_available_connection(self):
         return self.db.ping()
+
+    def put_data_humidity(self,value):
+        if self.check_available_connection():
+            try:
+                ret=self.db.set(self.varname_humidity,value)
+            except:
+                ret=False
+
     def put_data_flow_mass(self, **flow_mass_info):
         if self.check_available_connection():
             info=self.dict2str(**flow_mass_info)
@@ -50,10 +60,12 @@ class ConnectionRedis(ConnectionDb):
                 print("not found timeformat")
                 ret=False
             return ret
+
     def get_all_data_flow_mass(self):
         data=sorted(self.db.hgetall(self.varname_flow).items())
         data={"{}".format(self.binary2utf8(index)):self.str2dict(data) for index,data in data }
         return data
+
     def get_last_data_flow_mass(self):
         data=sorted(self.db.hgetall(self.varname_flow).items())
         if len(data):
@@ -63,6 +75,10 @@ class ConnectionRedis(ConnectionDb):
         else:
             data={}
         return data
+    
+    def get_humidity(self):
+        return self.db.get(self.varname_humidity).decode("utf-8")
+
     def dict2str(self,**dictionary):
         info=''
         for key,value in dictionary.items():
