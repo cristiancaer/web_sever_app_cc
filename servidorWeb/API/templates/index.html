@@ -5,8 +5,9 @@
     Index
 {%endblock%}
 {%block content%}
-    <a href="{{url_for('connection.get_all')}}">get all records</a>
-    <div>
-        <a href="{{url_for('connection.put_humidity')}}">Change default humidity</a>
+    <div class="container">
+        <a href="{{url_for('connection.get_all')}}">get all records</a> <br>
+        <a href="{{url_for('connection.put_humidity')}}">Change default humidity</a><br>
+        <a href="{{url_for('connection.get_raspberry_status')}}">Raspberry Status</a><br>
     </div>
 {%endblock%}

@@ -1,5 +1,5 @@
 from flask.helpers import url_for
-from .models import PutFlowForm,separator,PutHumidityForm
+from .models import ClearVarsForm, PutFlowForm,separator,PutHumidityForm
 from . import connection
 from flask import _app_ctx_stack,render_template,redirect,url_for,request,jsonify,session
 import json 
@@ -68,12 +68,34 @@ def get_last_data_flow():
         raise Exception('DB not find')
     return render_template('get_last.html',**context)
 
-@connection.route('/clear_all/<key>')
-def clear_all(key):
-    if key=='cc':
+@connection.route('/clear_all/',methods=['GET','POST'])
+def clear_all():
+    put_form=ClearVarsForm()
+    status=''
+    if request.method=='POST':
         if hasattr(_app_ctx_stack,'db'):
+                db=_app_ctx_stack.db
+                password=put_form.password.data
+                if db.check_password(password):
+                    db.clear_var()
+                    db.delete_var(db.varname_raspberry_status)
+                    status='Work Done'
+                else:
+                    status='Wrong password!!!'
+    context={'put_form':put_form,
+             'status': status
+            }
+    return render_template('clear_all.html',**context)
+@connection.route('/put_raspberry_status/',methods=['POST'])
+def put_raspberry_status():
+    request_data=request.get_json()# return a dict
+    if hasattr(_app_ctx_stack,'db'):
             db=_app_ctx_stack.db
-            db.clear_var()
-        return 'Done'
-    else:
-        return 'error: invalid key'
+            db.put_raspberry_status(request_data)
+    return 'ok'
+@connection.route('/get_raspberry_status/')
+def get_raspberry_status():
+    if hasattr(_app_ctx_stack,'db'):
+        db=_app_ctx_stack.db
+        context={'data':db.get_raspberry_status(),'separator':": "}
+    return render_template('get_raspberry_status.html',**context)

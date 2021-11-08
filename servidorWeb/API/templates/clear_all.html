@@ -1,0 +1,19 @@
+{% extends 'base.html'%}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block title%}
+    {{super()}}
+    Clear vars
+{%endblock%}
+{%block content%}
+    <div class="container">
+        <h1>Insert password to clear all vars</h1>
+        {{wtf.quick_form(put_form)}}
+    </div>
+    <div class="container" id="status">
+        {% if status %}
+        <h1>Status</h1>
+        <h2> {{status}}</h2>
+        {%endif%}
+    </div>
+{%endblock%}

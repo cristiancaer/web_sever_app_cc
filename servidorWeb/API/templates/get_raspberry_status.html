@@ -1,0 +1,19 @@
+{% extends 'base.html'%}
+{% block title%}
+    {{super()}}
+    Raspberry status
+{%endblock%}
+{% block content %}
+
+    <div class="container">
+        <h1>Raspberry Status</h1>
+        <ul>
+            {% for key,dato in data.items()%}
+                
+                <li class="data">
+                    {{key}}{{separator}}{{dato}}
+                </li>
+            {%endfor%}
+        </ul>
+    </div>
+{%endblock%}
