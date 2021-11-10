@@ -27,9 +27,9 @@ if __name__=='__main__':
     generador.start()
     while True:
        
-        input=input('pres c to exit: ')
+        key=input('pres c to exit: ')
         
-        if input=='c':
+        if key=='c':
             generador.running=False
             sleep(1)
             break

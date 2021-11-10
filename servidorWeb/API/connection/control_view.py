@@ -1,8 +1,9 @@
 from flask.helpers import url_for
 from .models import ClearVarsForm, PutFlowForm,separator,PutHumidityForm
 from . import connection
+from .models.checkConnection import connectionClient    
 from flask import _app_ctx_stack,render_template,redirect,url_for,request,jsonify,session
-import json 
+from datetime import datetime, time
 @connection.route('/put_humidity/',methods=['GET','POST'])
 def put_humidity():
     put_form=PutHumidityForm()
@@ -92,10 +93,38 @@ def put_raspberry_status():
     if hasattr(_app_ctx_stack,'db'):
             db=_app_ctx_stack.db
             db.put_raspberry_status(request_data)
-    return 'ok'
+    return request_data
 @connection.route('/get_raspberry_status/')
 def get_raspberry_status():
-    if hasattr(_app_ctx_stack,'db'):
-        db=_app_ctx_stack.db
-        context={'data':db.get_raspberry_status(),'separator':": "}
+    context={}
+    client_connection=connectionClient()
+    raspberry_status={}
+    status_update=None
+    datetime_now_str=None
+    datetime_status_str=None  
+
+    # if there is not advice message, connection is ok
+    if not client_connection.advice_message:
+        if hasattr(_app_ctx_stack,'db'):
+            db=_app_ctx_stack.db
+            raspberry_status=db.get_raspberry_status()
+            datetime_format='%y-%m-%d %H:%M:%S'
+            datetime_now=datetime.now()
+            datetime_status_str=raspberry_status.pop('datetime',None)
+            datetime_now_str=datetime_now.strftime(datetime_format)# change to str
+            if datetime_status_str:
+                datetime_status=datetime.strptime(datetime_status_str,datetime_format)#change to datetime object
+                delta_time=datetime_now-datetime_status
+            # if delta_time<60, the status is update.if delta_time >60 seconds, the status is outdate
+                status_update=delta_time.seconds<60
+            else:
+                status_update=False
+            
+    context={'raspberry_status':raspberry_status,
+             'status_update':status_update,
+             'datetime_now':datetime_now_str,
+             'datetime_status':datetime_status_str,   
+             'separator':" ",
+             "advice_message":client_connection.advice_message,
+             'client_connection_status':client_connection.message_status}
     return render_template('get_raspberry_status.html',**context)

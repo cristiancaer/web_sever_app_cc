@@ -7,13 +7,30 @@
 
     <div class="container">
         <h1>Raspberry Status</h1>
-        <ul>
-            {% for key,dato in data.items()%}
-                
-                <li class="data">
-                    {{key}}{{separator}}{{dato}}
-                </li>
-            {%endfor%}
-        </ul>
+        {% if advice_message=='' %}
+            {% if status_update %}
+                <h2>Update </h2>
+                <h4>Datetime status: {{datetime_status}}</h4>
+                <h4>Datetime now: {{datetime_now}}</h4>
+                <ul>
+                    {% for key,dato in raspberry_status.items():%}
+                        
+                        <li class="data">
+                            <b>{{key}}</b>{{separator}}{{dato}}
+                        </li>
+                    {%endfor%}
+                </ul>
+            {% else %}
+                <h2>Outdate !!</h2>
+                <h4>Datetime status: {{datetime_status}}</h4>
+                <h4>Datetime now: {{datetime_now}}</h4>
+                 <p>" Raspberry App is not sending data"</p>   
+            {%endif%}
+        {% else %}
+            <h2>Client status connection:</h2>
+            <h3>{{client_connection_status}}</h3>
+            <h2>Advice message:</h2>
+            <h3>{{advice_message}}</h3>
+        {% endif %}
     </div>
 {%endblock%}
